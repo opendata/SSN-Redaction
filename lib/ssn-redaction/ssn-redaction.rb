@@ -1,5 +1,11 @@
+require 'tabula'
 module SSNRedaction
-  PDFBOX = File.join(File.dirname(__FILE__), 'pdfbox-app-2.0.0-SNAPSHOT.jar')
 
-  require PDFBOX
+  def self.extract_text(filename, pages)
+    extractor = Tabula::Extraction::ObjectExtractor.new(filename, pages)
+
+
+
+  end
+
 end
