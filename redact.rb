@@ -19,6 +19,7 @@ def parse_command_line
     opt :password, 'Password to decrypt document. Default is empty', :default => ''
     opt :guess, 'Guess the portion of the page to analyze per page.'
     opt :silent, 'Suppress all stderr output.'
+    opt :test, 'Print amount of matches per page.'
   end
 
   Trollop::die "need one filename" if ARGV.empty?
@@ -31,8 +32,15 @@ end
 
 def main
   opts, filename = parse_command_line
-  
-  SSNRedcation::Reduce(filename)
+
+  if opts[:test]
+    amount_matches = SSNRedaction::count_matches(filename, /Flights/)
+
+    amount_matches[:pages].keys.each do |page_number|
+      puts "Page #{page_number}: #{amount_matches[:pages][page_number]} matches."
+    end
+    print "Total: %s" % amount_matches[:total]
+  end
 end
 
 main
