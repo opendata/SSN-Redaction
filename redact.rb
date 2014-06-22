@@ -15,10 +15,9 @@ def parse_command_line
       where [options] are:
       EOS
 
-    opt :pages, 'Comma separated list of ranges, or all. Examples: --pages 1-3,5-7, --pages 3 or --pages all. Default is --pages 1', :default => '1', :type => String
     opt :password, 'Password to decrypt document. Default is empty', :default => ''
-    opt :guess, 'Guess the portion of the page to analyze per page.'
     opt :silent, 'Suppress all stderr output.'
+    opt :test, 'Print amount of matches per page.'
   end
 
   Trollop::die "need one filename" if ARGV.empty?
@@ -31,8 +30,18 @@ end
 
 def main
   opts, filename = parse_command_line
-  
-  SSNRedcation::Reduce(filename)
+
+  if opts[:test]
+    amount_matches = SSNRedaction::count_matches(filename)
+
+    amount_matches[:pages].keys.each do |page_number|
+      puts "Page #{page_number}: #{amount_matches[:pages][page_number].length} matches."
+      amount_matches[:pages][page_number].each do |chunk|
+        puts chunk.text
+      end
+    end
+    print "Total: %s" % amount_matches[:total]
+  end
 end
 
 main
