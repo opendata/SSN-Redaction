@@ -66,31 +66,35 @@ CSV.foreach("gold.csv", :headers=>true) do |row|
   filename = get_filename(row['URL'])
   pages = get_pages(row['Page No.'])
 
-  result = `../redact.rb --test #{filename}`
-  puts(result)
-  foundpages = parse_result(result)
+  if File.file?(filename)
+    result = `../redact.rb --test #{filename}`
+    puts(result)
+    foundpages = parse_result(result)
 
 
-  if pages == foundpages
-    puts("#{filename}: correctly detected pages #{pages}")
+    if pages == foundpages
+      puts("#{filename}: correctly detected pages #{pages}")
+    else
+      puts("#{filename}: ERROR found #{foundpages}, correct pages are #{pages}")
+      false_negatives += (pages-foundpages).length
+      false_positives += (foundpages-pages).length
+      true_positives += (pages&foundpages).length
+    end
+
+    true_pages += pages.length
+    files += 1
+
+    puts("------------")
+    puts("Tested #{files} files")
+    puts("Pages with SSNs to detect: #{true_pages}")
+    puts("Pages with false negatives: #{false_negatives}")
+    puts("Pages with false_positives: #{false_positives}")
+    puts("Precision: #{true_positives.to_f/(true_positives + false_positives)}")
+    puts("Recall: #{true_positives.to_f/(true_positives + false_negatives)}")
+    puts("------------")
   else
-    puts("#{filename}: ERROR found #{foundpages}, correct pages are #{pages}")
-    false_negatives += (pages-foundpages).length
-    false_positives += (foundpages-pages).length
-    true_positives += (pages&foundpages).length
+    puts("Missing test file #{filename}")
   end
-
-  true_pages += pages.length
-  files += 1
-
-  puts("------------")
-  puts("Tested #{files} files")
-  puts("Pages with SSNs to detect: #{true_pages}")
-  puts("Pages with false negatives: #{false_negatives}")
-  puts("Pages with false_positives: #{false_positives}")
-  puts("Precision: #{true_positives.to_f/(true_positives + false_positives)}")
-  puts("Recall: #{true_positives.to_f/(true_positives + false_negatives)}")
-  puts("------------")
 
   if (files >= max_files)
     break
