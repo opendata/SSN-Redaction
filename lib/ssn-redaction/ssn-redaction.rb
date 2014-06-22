@@ -1,4 +1,6 @@
 require 'tabula'
+require_relative './redaction_engine.rb'
+
 module SSNRedaction
 
   def self.openPDF(filename, password='')
@@ -44,24 +46,30 @@ module SSNRedaction
   end
 
   # TODO
-  def self.rebuild_pdf(extractor, pdf_filename)
-    try {
-      pdf_file_path = File.expand_path(pdf_filename, File.dirname(__FILE__))
-      document = PDDocument.new(pdf_file_path)
+  def self.rebuild_pdf(extractor, pdf_filename, redacted_filename)
+    pdf_file_path = File.expand_path(pdf_filename, File.dirname(__FILE__))
+    document = org.apache.pdfbox.pdmodel.PDDocument.load(pdf_file_path)
+    rse = RedactionStreamEngine.new([], redacted_filename)
 
-      extractor.extract.each do |page|
-        new_page = PDPage.new()
-        document.addPage(new_page)
-
-        contentStream  = PDPageContentStream.new(document, new_page)
-
-        # write the text
-
-        contentStream.close()
-      end
-
-      self.document.save(filename);
-      self.document.close();
-    }
+    all_pages = document.getDocumentCatalog.getAllPages
+    all_pages.each_with_index do |page, page_number|
+      STDERR.puts "processing page: #{page}"
+      rse.processStream(page, page.findResources, page.getContents.getStream)
+      # parser = org.apache.pdfbox.pdfpa rser.PDFStreamParser.new(page.getContents)
+      # parser.parse
+      # tokens = parser.getTokens
+      # arguments = []
+      # tokens.each do |token|
+      #   if token.java_kind_of?(org.apache.pdfbox.cos.COSObject)
+      #     arguments << token.getObject
+      #   elsif token.java_kind_of?(org.apache.pdfbox.util.PDFOperator) and
+      #        (token.getOperation == 'TJ' or token.getOperation == 'Tj')
+      #     puts arguments.inspect
+      #     arguments = []
+      #   else
+      #     arguments << token
+      #   end
+      # end
+    end
   end
 end
