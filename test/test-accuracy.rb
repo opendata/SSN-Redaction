@@ -83,18 +83,21 @@ CSV.foreach("gold.csv", :headers=>true) do |row|
   true_pages += pages.length
   files += 1
 
+  puts("------------")
+  puts("Tested #{files} files")
+  puts("Pages with SSNs to detect: #{true_pages}")
+  puts("Pages with false negatives: #{false_negatives}")
+  puts("Pages with false_positives: #{false_positives}")
+  puts("Precision: #{true_positives.to_f/(true_positives + false_positives)}")
+  puts("Recall: #{true_positives.to_f/(true_positives + false_negatives)}")
+  puts("------------")
+
   if (files >= max_files)
     break
   end
+
 end
 
 
-puts("------------")
-puts("Tested #{files} files")
-puts("Pages with SSNs to detect: #{true_pages}")
-puts("Pages with false negatives: #{false_negatives}")
-puts("Pages with false_positives: #{false_positives}")
-puts("Precision: #{true_positives.to_f/(true_positives + false_positives)}")
-puts("Recall: #{true_positives.to_f/(true_positives + false_negatives)}")
 
 
