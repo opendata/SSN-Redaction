@@ -33,8 +33,11 @@ end
 def main
   opts, filename = parse_command_line
 
+  # Default pattern for SSN
+  pattern = /(?!666|000|9\d{2})\d{3}(-|\s?)(?!00)\d{2}\1(?!0{4})\d{4}/
+
   if opts[:test]
-    amount_matches = SSNRedaction::count_matches(filename, /Flights/)
+    amount_matches = SSNRedaction::count_matches(filename, pattern)
 
     amount_matches[:pages].keys.each do |page_number|
       puts "Page #{page_number}: #{amount_matches[:pages][page_number]} matches."
