@@ -6,9 +6,13 @@
 
 require 'csv'
 
+# number of files to test (don't read entire CSV)
+max_files = 9999
+
+
 # Turn URL to filename
 # https://bulk.resource.org/irs.gov/eo/2014_02_EO/26-2809844_990EZ_201312.pdf -> 
-# 2014_02_EO/26-2809844_990EZ_201312_ocr.pdf
+# 990s/2014_02_EO/26-2809844_990EZ_201312_ocr.pdf
 def get_filename(url)
   parts = url.split('/')
   dirname = parts[-2]
@@ -52,18 +56,45 @@ def parse_result(result)
   pages
 end
 
+false_positives = 0
+false_negatives = 0
+true_positives = 0
+true_pages = 0
+files = 0
 
 CSV.foreach("gold.csv", :headers=>true) do |row|
   filename = get_filename(row['URL'])
   pages = get_pages(row['Page No.'])
 
   result = `../redact.rb --test #{filename}`
-  #puts(result)
+  puts(result)
   foundpages = parse_result(result)
+
 
   if pages == foundpages
     puts("#{filename}: correctly detected pages #{pages}")
   else
     puts("#{filename}: ERROR found #{foundpages}, correct pages are #{pages}")
+    false_negatives += (pages-foundpages).length
+    false_positives += (foundpages-pages).length
+    true_positives += (pages&foundpages).length
+  end
+
+  true_pages += pages.length
+  files += 1
+
+  if (files >= max_files)
+    break
   end
 end
+
+
+puts("------------")
+puts("Tested #{files} files")
+puts("Pages with SSNs to detect: #{true_pages}")
+puts("Pages with false negatives: #{false_negatives}")
+puts("Pages with false_positives: #{false_positives}")
+puts("Precision: #{true_positives.to_f/(true_positives + false_positives)}")
+puts("Recall: #{true_positives.to_f/(true_positives + false_negatives)}")
+
+
