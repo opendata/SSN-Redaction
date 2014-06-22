@@ -4,7 +4,7 @@ $:.push File.expand_path("../lib", __FILE__)
 Gem::Specification.new do |s|
   s.name        = "ssn-redaction"
   s.version     = "0.0.1"
-  s.authors     = ["Waldo Jaquith", "Manuel Aristaran", "Gaba Rodriguez", "Jonathan Stray", "Ying Quan Tan"]
+  s.authors     = ["Waldo Jaquith", "Manuel Aristaran", "Gabriela Rodriguez", "Jonathan Stray", "Ying Quan Tan"]
   s.email       = ["manuel@jazzido.com"]
   s.homepage    = "https://github.com/USODI/SSN-Redaction"
   s.summary     = %q{redact SSNs from PDF files}

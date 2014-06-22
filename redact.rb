@@ -2,6 +2,7 @@
 # encoding: utf-8
 require 'trollop'
 require_relative 'lib/pdfbox'
+require_relative 'lib/ssn-redaction/ssn-redaction'
 
 def parse_command_line
   opts = Trollop::options do
@@ -30,8 +31,8 @@ end
 
 def main
   opts, filename = parse_command_line
-
-  print filename
+  
+  SSNRedcation::Reduce(filename)
 end
 
 main
