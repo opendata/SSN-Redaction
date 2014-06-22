@@ -76,7 +76,7 @@ module SSNRedaction
 
     pages.each_with_index do |page, page_number|
       chunks_per_page = SSNRedaction.get_matching_chunks(pdf_filename, page_number+1, pattern)
-      amount_matches_per_page[page_number+1] = chunks_per_page.length
+      amount_matches_per_page[page_number+1] = chunks_per_page
       total += chunks_per_page.length
     end
 
