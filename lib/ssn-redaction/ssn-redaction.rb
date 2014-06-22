@@ -1,8 +1,8 @@
 require 'tabula'
 module SSNRedaction
 
-  def self.openPDF(filename, password='')
-    raise Errno::ENOENT unless File.exists?(pdf_filename)
+  def self.open_pdf(filename, password='')
+    raise Errno::ENOENT unless File.exists?(filename)
     document = PDDocument.load(filename)
     if document.isEncrypted
       sdm = StandardDecryptionMaterial.new(password)
@@ -63,5 +63,23 @@ module SSNRedaction
       self.document.save(filename);
       self.document.close();
     }
+  end
+
+  def self.count_matches(pdf_filename, pattern)
+
+    amount_matches_per_page = {}
+    total = 0
+
+    document = SSNRedaction.open_pdf(pdf_filename)
+
+    pages = document.getDocumentCatalog.getAllPages().to_a
+
+    pages.each_with_index do |page, page_number|
+      chunks_per_page = SSNRedaction.get_matching_chunks(pdf_filename, page_number+1, pattern)
+      amount_matches_per_page[page_number+1] = chunks_per_page.length
+      total += chunks_per_page.length
+    end
+
+    {:pages => amount_matches_per_page, :total => total}
   end
 end
