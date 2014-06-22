@@ -12,6 +12,7 @@ Created in Ruby and Java, this tool accepts PDFs with embedded text and 1) detec
 * `--password`: Password to decrypt document.
 * `--guess`: Guess the portion of each page to analyze.
 * `--silent`: Suppress all stderr output.
+* `--test`: Print detected SSN strings to stdout, do not write output PDF 
 
 ## License
 
