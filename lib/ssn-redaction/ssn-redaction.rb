@@ -11,14 +11,25 @@ module SSNRedaction
     document
   end
 
+  # THIS IS THE MATCHING FUNCTION (right now is tied to SSN pattern)
+  def self.match_pattern(text_to_match)
+    # Default pattern for SSN
+    pattern = /(?<!\d)(?!666|000|9\d{2})([OoIli0-9]{3})([\s-]?)(?!00)([OoIli0-9]{2})\2(?!0{4})([OoIli0-9]{4})(?!\d)/
+    # rest_of_the_chunk = text_to_match.split(pattern.match(text_to_match).to_s)
+    # first_character = rest_of_the_chunk[0][0]
+    # last_character = rest_of_the_chunk[0][rest_of_the_chunk[0].size-1]
+
+    text_to_match =~ pattern
+  end
+
   # matching
-  def self.get_matching_chunks(filename, page, pattern)
+  def self.get_matching_chunks(filename, page)
     extractor = Tabula::Extraction::ObjectExtractor.new(filename, [page])
     filtered = []
 
     extractor.extract.inject([]) do |memo, pdf_page|
       memo += Tabula::TextElement.merge_words(pdf_page.get_text).select do |chunk|
-        chunk.text =~ pattern
+        match_pattern(chunk.text)
       end
     end
   end
@@ -65,7 +76,7 @@ module SSNRedaction
     }
   end
 
-  def self.count_matches(pdf_filename, pattern)
+  def self.count_matches(pdf_filename)
 
     amount_matches_per_page = {}
     total = 0
@@ -75,7 +86,7 @@ module SSNRedaction
     pages = document.getDocumentCatalog.getAllPages().to_a
 
     pages.each_with_index do |page, page_number|
-      chunks_per_page = SSNRedaction.get_matching_chunks(pdf_filename, page_number+1, pattern)
+      chunks_per_page = SSNRedaction.get_matching_chunks(pdf_filename, page_number+1)
       amount_matches_per_page[page_number+1] = chunks_per_page
       total += chunks_per_page.length
     end
