@@ -2,6 +2,10 @@
 
 A redaction tool for Social Security Numbers in PDFs.
 
+**WARNING: THIS PROJECT IS INCOMPLETE! DOES NOT YET REMOVE SSNs FROM PDF TEXT!**
+
+**DO NOT USE YET!**
+
 ## Overview
 
 Created in Ruby and Java, this tool accepts PDFs with embedded text and 1) detects the presence of Social Security Numbers, 2) removes the Social Security Numbers, and 3) draws a black box where the Social Security Number was, as a visual indicator of redaction.
